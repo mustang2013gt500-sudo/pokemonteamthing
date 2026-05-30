@@ -1,0 +1,43 @@
+{
+  "series": "Scarlet/Violet",
+  "maxTeamSize": 6,
+  "maxMovesPerPokemon": 4,
+  "restrictedSpeciesLimit": 2,
+  "restrictedSpecies": [
+    "koraidon",
+    "miraidon",
+    "pecharunt",
+    "walking-wake",
+    "iron-leaves",
+    "raging-bolt",
+    "iron-crown",
+    "terapagos"
+  ],
+  "bannedSpecies": [
+    "mew",
+    "mewtwo",
+    "lugia",
+    "ho-oh",
+    "kyogre",
+    "groudon",
+    "rayquaza",
+    "dialga",
+    "palkia",
+    "giratina",
+    "reshiram",
+    "zekrom",
+    "kyurem",
+    "xerneas",
+    "yveltal",
+    "zygarde",
+    "cosmog",
+    "cosmoem",
+    "solgaleo",
+    "lunala",
+    "ultra-necrozma",
+    "eternatus",
+    "calyrex"
+  ],
+  "maxDuplicateItems": 1,
+  "notes": "Rules as of 2024-2025 VGC season. Update this config if official rules change."
+}

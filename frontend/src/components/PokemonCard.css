@@ -1,0 +1,140 @@
+.pokemon-card {
+  position: relative;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.pokemon-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #dc3545;
+  color: white;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.remove-btn:hover {
+  background: #c82333;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pokemon-sprite {
+  width: 80px;
+  height: 80px;
+  image-rendering: pixelated;
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.card-title {
+  flex: 1;
+}
+
+.card-title h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  text-transform: capitalize;
+  font-size: 1.3rem;
+}
+
+.card-types {
+  display: flex;
+  gap: 6px;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+}
+
+.moves-list {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 8px;
+  min-height: 40px;
+}
+
+.move-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.move-item:last-child {
+  margin-bottom: 0;
+}
+
+.move-name {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.move-item .type-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+
+.no-moves {
+  color: #999;
+  font-style: italic;
+  margin: 0;
+  padding: 8px;
+}
+
+@media (max-width: 480px) {
+  .card-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .pokemon-sprite {
+    width: 100px;
+    height: 100px;
+  }
+}

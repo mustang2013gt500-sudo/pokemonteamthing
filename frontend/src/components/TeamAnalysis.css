@@ -1,0 +1,117 @@
+.team-analysis {
+  color: #333;
+}
+
+.team-analysis h2 {
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.analysis-section {
+  margin-bottom: 24px;
+}
+
+.analysis-section h3 {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 8px;
+}
+
+.type-group {
+  margin-bottom: 16px;
+}
+
+.type-group-title {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.type-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.type-badge.weak {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.empty-type {
+  color: #999;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.gap-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.gap-stat {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  border-left: 4px solid #667eea;
+}
+
+.gap-stat strong {
+  display: block;
+  font-size: 1.5rem;
+  color: #667eea;
+  margin-bottom: 4px;
+}
+
+.gap-stat span {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.gaps-list {
+  background: #fff3e0;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #f57f17;
+}
+
+.gaps-title {
+  font-weight: 600;
+  color: #f57f17;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .team-analysis {
+    font-size: 0.9rem;
+  }
+
+  .analysis-section h3 {
+    font-size: 0.95rem;
+  }
+
+  .gap-stats {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,89 @@
+.move-picker {
+  max-width: 700px;
+}
+
+.search-input {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.moves-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  padding: 8px;
+}
+
+.move-option {
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.move-option:hover {
+  border-color: #667eea;
+  background: #f8f9fa;
+}
+
+.move-option.selected {
+  border-color: #667eea;
+  background: #f0f1ff;
+}
+
+.move-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.move-option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.move-option-name {
+  font-weight: 600;
+  color: #333;
+  text-transform: capitalize;
+}
+
+.checkmark {
+  color: #667eea;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.move-option-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.power {
+  color: #666;
+  font-weight: 500;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.modal-actions button {
+  flex: 1;
+  min-width: 120px;
+}
+
+@media (max-width: 600px) {
+  .moves-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}

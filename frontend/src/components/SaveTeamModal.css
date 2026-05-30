@@ -1,0 +1,29 @@
+.save-team-modal {
+  max-width: 500px;
+}
+
+.save-team-modal .form-group {
+  margin-bottom: 16px;
+}
+
+.save-team-modal input {
+  width: 100%;
+}
+
+.save-team-modal small {
+  display: block;
+  color: #999;
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.modal-actions button {
+  flex: 1;
+  min-width: 120px;
+}
