@@ -1,4 +1,8 @@
-import vgcRulesConfig from '../config/vgc-rules.json' assert { type: 'json' };
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const rulesPath = fileURLToPath(new URL('../config/vgc-rules.json', import.meta.url));
+const vgcRulesConfig = JSON.parse(readFileSync(rulesPath, 'utf8'));
 
 const { restrictedSpecies, bannedSpecies, restrictedSpeciesLimit, maxMovesPerPokemon, maxTeamSize } = vgcRulesConfig;
 

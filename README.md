@@ -1,171 +1,311 @@
-# Pokémon VGC Team Builder
+# Pokemon VGC Team Builder
 
-A full-stack web application for building and analyzing Pokémon VGC (Video Game Championships) competitive teams.
+A full-stack web application for building and analyzing Pokemon VGC (Video Game Championships) competitive teams.
 
 ## Features
 
-- 🔍 **Search & Pick Pokémon** - Find any Pokémon from the National Dex
-- ⚔️ **Team Building** - Construct a team of 6 Pokémon with abilities, natures, items, and moves
-- 📊 **Type Coverage Analysis** - View offensive and defensive type coverage for your team
-- ✅ **VGC Rule Validation** - Automatic validation against current VGC rules (restricted species, banned Pokémon, etc.)
-- 💾 **Team Persistence** - Save and load multiple teams locally
-- 📤 **Export Teams** - Export teams as text format for sharing
+- Search and pick Pokemon from the National Dex
+- Build teams of up to 6 Pokemon with abilities, natures, items, and moves
+- Analyze offensive and defensive type coverage
+- Validate teams against configurable VGC rules
+- Save and load teams locally in the browser
+- Export teams as text for sharing
 
 ## Project Structure
 
-```
+```text
 pokemonteamthing/
-├── backend/           # Node.js + Express API server
+├── backend/             # Node.js + Express API server
 │   ├── src/
-│   │   ├── index.js  # Main server entry
-│   │   ├── routes/   # API routes
-│   │   ├── services/ # Business logic
-│   │   └── config/   # Configuration
-│   └── package.json
-├── frontend/          # React + Vite web app
+│   ├── Dockerfile
+│   ├── package.json
+│   └── package-lock.json
+├── frontend/            # React + Vite web app
 │   ├── src/
-│   │   ├── pages/    # Page components
-│   │   ├── components/ # UI components
-│   │   ├── hooks/    # Custom React hooks
-│   │   ├── services/ # API client
-│   │   └── utils/    # Utilities
-│   └── package.json
+│   ├── Dockerfile
+│   ├── package.json
+│   └── package-lock.json
+├── docker-compose.yml   # Cross-platform local dev environment
+├── package.json         # Root helper scripts
+├── AGENTS.md            # Guidance for Codex, Copilot, and other AI agents
 └── README.md
 ```
 
-## Quick Start
+## Recommended Local Setup
+
+The easiest way for Mac and Windows contributors to run the same environment is Docker Compose. Docker keeps the Node.js version and dependency install behavior consistent across machines.
+
+### Mac Setup
+
+1. Install Docker Desktop for Mac:
+   - https://www.docker.com/products/docker-desktop/
+2. Start Docker Desktop.
+3. Clone the repository:
+
+```bash
+git clone https://github.com/mustang2013gt500-sudo/pokemonteamthing.git
+cd pokemonteamthing
+```
+
+4. Start the app:
+
+```bash
+docker compose up --build
+```
+
+5. Open the frontend:
+
+```text
+http://localhost:3000
+```
+
+The backend API runs at:
+
+```text
+http://localhost:5050/api/health
+```
+
+### Windows Setup
+
+1. Install Docker Desktop for Windows:
+   - https://www.docker.com/products/docker-desktop/
+2. During installation, enable WSL 2 if Docker asks for it.
+3. Start Docker Desktop.
+4. Clone the repository using Git Bash, PowerShell, Windows Terminal, or VS Code:
+
+```bash
+git clone https://github.com/mustang2013gt500-sudo/pokemonteamthing.git
+cd pokemonteamthing
+```
+
+5. Start the app:
+
+```bash
+docker compose up --build
+```
+
+6. Open the frontend:
+
+```text
+http://localhost:3000
+```
+
+The backend API runs at:
+
+```text
+http://localhost:5050/api/health
+```
+
+### Daily Docker Commands
+
+Start the app:
+
+```bash
+docker compose up
+```
+
+Rebuild containers after dependency or Dockerfile changes:
+
+```bash
+docker compose up --build
+```
+
+Stop the app:
+
+```bash
+docker compose down
+```
+
+Run with npm helper scripts:
+
+```bash
+npm run dev:docker
+npm run dev:docker:build
+npm run dev:docker:down
+```
+
+## Non-Docker Setup
+
+Use this only if you specifically want to run Node directly on your machine.
 
 ### Prerequisites
-- Node.js 16+ 
-- npm or yarn
 
-### 1. Install Backend Dependencies
+- Node.js 20 LTS recommended
+- npm
+
+Install dependencies:
+
 ```bash
-cd backend
-npm install
+npm run install:all
 ```
 
-### 2. Start Backend Server
-```bash
-npm run dev
-```
-Backend will run on `http://localhost:5000`
+Start the backend in one terminal:
 
-### 3. Install Frontend Dependencies (in a new terminal)
 ```bash
-cd frontend
-npm install
+npm run dev:backend
 ```
 
-### 4. Start Frontend Dev Server
-```bash
-npm run dev
-```
-Frontend will run on `http://localhost:3000`
+Start the frontend in another terminal:
 
-### 5. Open in Browser
-Navigate to `http://localhost:3000`
+```bash
+npm run dev:frontend
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+## Development Workflow
+
+Do not work directly on `main` for feature work. Use branches so two people can work without overwriting each other.
+
+Update your local `main`:
+
+```bash
+git checkout main
+git pull origin main
+```
+
+Create a branch:
+
+```bash
+git checkout -b your-name/short-feature-name
+```
+
+Commit your work:
+
+```bash
+git status
+git add .
+git commit -m "Describe the change"
+```
+
+Push your branch:
+
+```bash
+git push -u origin your-name/short-feature-name
+```
+
+Then open a pull request on GitHub and review it before merging into `main`.
+
+## Dependency Rules
+
+- Commit `backend/package-lock.json` and `frontend/package-lock.json`.
+- Do not commit `node_modules/`.
+- If dependencies change, rebuild Docker:
+
+```bash
+docker compose up --build
+```
+
+- If Docker dependency state gets weird, reset containers and volumes:
+
+```bash
+docker compose down --volumes
+docker compose up --build
+```
+
+## Environment Variables
+
+Backend defaults:
+
+```text
+PORT=5050
+POKEAPI_BASE_URL=https://pokeapi.co/api/v2
+```
+
+Example files:
+
+- `backend/.env.example`
+- `frontend/.env.example`
+
+The current frontend calls `/api`, and Vite proxies that path to the backend during development.
 
 ## API Endpoints
 
-### Pokémon
-- `GET /api/pokemon?q=pikachu` - Search Pokémon
-- `GET /api/pokemon/:idOrName` - Get Pokémon details
+### Pokemon
+
+- `GET /api/pokemon?q=pikachu` - Search Pokemon
+- `GET /api/pokemon/:idOrName` - Get Pokemon details
 
 ### Moves
+
 - `GET /api/moves/:idOrName` - Get move details
 
 ### Teams
+
 - `POST /api/teams/validate` - Validate team against VGC rules
 - `POST /api/teams/analyze` - Analyze team type coverage
 
 ## Tech Stack
 
 ### Backend
-- **Node.js** - JavaScript runtime
-- **Express.js** - Web framework
-- **Axios** - HTTP client for PokéAPI
-- **node-cache** - In-memory caching
-- **CORS** - Cross-origin resource sharing
+
+- Node.js
+- Express
+- Axios
+- node-cache
+- CORS
 
 ### Frontend
-- **React 18** - UI library
-- **Vite** - Build tool & dev server
-- **React Router** - Client-side routing
-- **CSS3** - Styling
+
+- React 18
+- Vite
+- React Router
+- CSS
 
 ### Data Source
-- **PokéAPI v2** - Free Pokémon data API (https://pokeapi.co)
 
-## Features Breakdown
+- PokeAPI v2: https://pokeapi.co
 
-### Core Features (MVP)
-1. ✅ Search and select 6 Pokémon
-2. ✅ Assign 4 moves per Pokémon
-3. ✅ Choose abilities, natures, held items
-4. ✅ Calculate offensive type coverage
-5. ✅ Calculate defensive weaknesses & resistances
-6. ✅ VGC rule validation
-7. ✅ Save/load teams locally
-8. ✅ Export teams as text
+## Hosting Notes
 
-### Future Enhancements
-- Damage calculator with stat simulation
-- Cloud storage & account sync
-- Team sharing & public repository
-- Battle simulator
-- Rental code generation
-- Import from Pokémon Showdown format
-- EV/IV calculator
+The current app can be hosted in two common ways:
 
-## VGC Rules Implemented
+1. Keep frontend and backend separate:
+   - Host frontend on Vercel, Netlify, or Cloudflare Pages.
+   - Host backend on Render, Railway, Fly.io, or a similar Node host.
+2. Build the frontend and serve it from the Express backend:
+   - This creates one deployable Node service.
+   - This is usually the simplest next hosting step for this app.
 
-- **Team Size**: Max 6 Pokémon
-- **Restricted Species Limit**: Max 2 per team
-- **Species Duplication**: Each species max 1 per team
-- **Move Legality**: Each Pokémon can only use moves it can learn
-- **Item Uniqueness**: Each held item can only be used once
-- **Banned Species**: Mythical Pokémon and event-exclusives are blocked
-
-Rules are configurable in `backend/src/config/vgc-rules.json`
-
-## Type Coverage Explanation
-
-### Offensive Coverage
-Shows what types your team's moves are super-effective against. If you hit many different types, your team has good offensive coverage.
-
-### Defensive Coverage  
-Shows what types hit your team hard (weaknesses) and what types your team resists. Good defensive synergy means team members cover each other's weaknesses.
-
-## Performance Notes
-
-- PokéAPI data is cached for 24 hours to minimize API calls
-- Type effectiveness uses a hard-coded lookup table (no API calls)
-- Teams are stored in browser localStorage (no backend database required for MVP)
+The app does not currently need a database. Saved teams are stored in each browser's `localStorage`, so they do not sync between computers yet.
 
 ## Troubleshooting
 
-**Backend won't start?**
-- Make sure port 5000 is not in use
-- Check Node.js version: `node --version` (should be 16+)
+### Port Already In Use
 
-**Frontend won't connect to backend?**
-- Ensure backend is running on port 5000
-- Check browser console for CORS errors
-- Vite proxy is configured in `vite.config.js`
+If `3000` or `5050` is already in use, stop the other app or change the ports in `docker-compose.yml` and `frontend/vite.config.js`.
 
-**PokéAPI is slow?**
-- PokéAPI can have rate limiting - be patient or try again later
-- Cache should help on subsequent requests
+### Frontend Cannot Reach Backend
 
-## License
+Check that the backend is healthy:
 
-MIT
+```text
+http://localhost:5050/api/health
+```
 
-## Contributing
+Then restart Docker:
 
-Contributions welcome! Please fork and submit a pull request.
+```bash
+docker compose down
+docker compose up --build
+```
 
----
+### PokeAPI Is Slow
 
-Built with ⚡ for competitive Pokémon players
+PokeAPI can be slow or rate-limited. The backend caches PokeAPI responses in memory for 24 hours while the backend container is running.
+
+## AI-Assisted Development
+
+This project includes `AGENTS.md` for Codex, Copilot, and other AI coding assistants. Agents should read that file before making changes.
+
+In short:
+
+- Work on a branch, not directly on `main`.
+- Prefer Docker Compose for local verification.
+- Keep dependency lockfiles committed.
+- Avoid committing generated folders such as `node_modules/` and `frontend/dist/`.
+- Update this README when setup steps change.
