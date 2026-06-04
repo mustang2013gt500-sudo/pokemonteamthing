@@ -56,12 +56,39 @@ function toOverridePokemon(override, inheritedMoves = []) {
   };
 }
 
+function toPokemonSummary(pokemon) {
+  return {
+    id: pokemon.id,
+    name: pokemon.name,
+    displayName: pokemon.displayName || titleizeName(pokemon.name),
+    types: pokemon.types,
+    baseStats: pokemon.baseStats,
+    sprite: pokemon.sprite
+  };
+}
+
 function toItemSummary(item) {
   return {
     id: item.id,
     name: item.name,
     displayName: item.displayName || titleizeName(item.name),
     category: item.category
+  };
+}
+
+function comparePokemonByStat(stat) {
+  return (a, b) => {
+    const statDiff = (b.baseStats?.[stat] || 0) - (a.baseStats?.[stat] || 0);
+
+    if (statDiff) {
+      return statDiff;
+    }
+
+    if (Number.isFinite(a.id) && Number.isFinite(b.id)) {
+      return a.id - b.id;
+    }
+
+    return a.name.localeCompare(b.name);
   };
 }
 
@@ -76,14 +103,33 @@ async function mapWithConcurrency(items, limit, mapper) {
   return results;
 }
 
+async function getPokemonListEntries() {
+  const cacheKey = 'pokemon:list-entries';
+  const cached = cache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const response = await axios.get(`${API_BASE}/pokemon?limit=${POKEMON_LIST_LIMIT}`);
+  const entries = [
+    ...response.data.results.map(pokemon => ({ name: pokemon.name, url: pokemon.url })),
+    ...currentOverrides.pokemon.map(pokemon => ({ name: pokemon.name, url: null }))
+  ];
+  const uniqueEntries = [...new Map(entries.map(pokemon => [pokemon.name, pokemon])).values()];
+
+  cache.set(cacheKey, uniqueEntries);
+  return uniqueEntries;
+}
+
 /**
- * Fetch Pokémon by ID or name with caching
+ * Fetch Pokemon by ID or name with caching.
  */
 export async function fetchPokemon(idOrName) {
   const normalizedName = normalizeName(idOrName);
   const cacheKey = `pokemon:${normalizedName}`;
   const cached = cache.get(cacheKey);
-  
+
   if (cached) {
     return cached;
   }
@@ -128,23 +174,23 @@ export async function fetchPokemon(idOrName) {
       sprite: response.data.sprites.other['official-artwork'].front_default || response.data.sprites.front_default,
       moves: response.data.moves.map(m => m.move.name)
     };
-    
+
     cache.set(cacheKey, pokemon);
     return pokemon;
   } catch (error) {
-    console.error(`Error fetching Pokémon ${idOrName}:`, error.message);
-    throw new Error(`Pokémon not found: ${idOrName}`);
+    console.error(`Error fetching Pokemon ${idOrName}:`, error.message);
+    throw new Error(`Pokemon not found: ${idOrName}`);
   }
 }
 
 /**
- * Fetch move by ID or name with caching
+ * Fetch move by ID or name with caching.
  */
 export async function fetchMove(idOrName) {
   const normalizedName = normalizeName(idOrName);
   const cacheKey = `move:${normalizedName}`;
   const cached = cache.get(cacheKey);
-  
+
   if (cached) {
     return cached;
   }
@@ -168,7 +214,7 @@ export async function fetchMove(idOrName) {
       priority: response.data.priority,
       effect: response.data.effect_entries.find(entry => entry.language.name === 'en')?.effect || 'No effect listed'
     };
-    
+
     cache.set(cacheKey, move);
     return move;
   } catch (error) {
@@ -178,13 +224,13 @@ export async function fetchMove(idOrName) {
 }
 
 /**
- * Fetch type with effectiveness data
+ * Fetch type with effectiveness data.
  */
 export async function fetchType(typeNameOrId) {
   const normalizedName = normalizeName(typeNameOrId);
   const cacheKey = `type:${normalizedName}`;
   const cached = cache.get(cacheKey);
-  
+
   if (cached) {
     return cached;
   }
@@ -202,7 +248,7 @@ export async function fetchType(typeNameOrId) {
         immuneTo: response.data.damage_relations.no_damage_from.map(t => t.name)
       }
     };
-    
+
     cache.set(cacheKey, type);
     return type;
   } catch (error) {
@@ -212,34 +258,139 @@ export async function fetchType(typeNameOrId) {
 }
 
 /**
- * Search Pokémon by name (returns first 20 matches from PokéAPI's namespace)
+ * Search Pokemon by name.
  */
 export async function searchPokemon(query) {
   const normalizedQuery = normalizeName(query);
   const cacheKey = `search:pokemon:${normalizedQuery}`;
   const cached = cache.get(cacheKey);
-  
+
   if (cached) {
     return cached;
   }
 
   try {
-    const response = await axios.get(`${API_BASE}/pokemon?limit=${POKEMON_LIST_LIMIT}`);
-    const allPokemon = [
-      ...response.data.results,
-      ...currentOverrides.pokemon.map(pokemon => ({ name: pokemon.name, url: null }))
-    ];
+    const allPokemon = await getPokemonListEntries();
     const matches = allPokemon
       .filter(p => p.name.includes(normalizedQuery))
       .slice(0, 30)
       .map(p => ({ name: p.name, url: p.url }));
-    
+
     cache.set(cacheKey, matches);
     return matches;
   } catch (error) {
-    console.error(`Error searching Pokémon:`, error.message);
+    console.error('Error searching Pokemon:', error.message);
     return [];
   }
+}
+
+/**
+ * List Pokemon with browsing, filtering, and pagination.
+ */
+export async function listPokemon({
+  query = '',
+  page = 1,
+  limit = 24,
+  type = '',
+  stat = '',
+  minStat = ''
+} = {}) {
+  const normalizedQuery = normalizeName(query);
+  const normalizedType = normalizeName(type);
+  const normalizedStat = stat.trim();
+  const minimumStat = Number(minStat);
+  const currentPage = Math.max(Number(page) || 1, 1);
+  const pageSize = Math.min(Math.max(Number(limit) || 24, 1), 60);
+  const cacheKey = `list:pokemon:${normalizedQuery}:${currentPage}:${pageSize}:${normalizedType}:${normalizedStat}:${minimumStat || ''}`;
+  const cached = cache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  try {
+    const allPokemon = await getPokemonListEntries();
+    const typeNames = normalizedType ? await fetchPokemonNamesByType(normalizedType) : null;
+    const typeNameSet = typeNames ? new Set(typeNames) : null;
+
+    let matchingNames = allPokemon
+      .map(p => p.name)
+      .filter(name => !normalizedQuery || name.includes(normalizedQuery))
+      .filter(name => !typeNameSet || typeNameSet.has(name));
+
+    const statFilterEnabled = normalizedStat && Number.isFinite(minimumStat) && minimumStat > 0;
+    const statSortEnabled = Boolean(normalizedStat);
+
+    if (statFilterEnabled || statSortEnabled) {
+      const detailed = await mapWithConcurrency(
+        matchingNames,
+        DETAIL_BATCH_SIZE,
+        name => fetchPokemon(name).catch(() => null)
+      );
+
+      matchingNames = detailed
+        .filter(Boolean)
+        .filter(pokemon => {
+          if (!statFilterEnabled) {
+            return true;
+          }
+
+          return (pokemon.baseStats?.[normalizedStat] || 0) >= minimumStat;
+        })
+        .sort(comparePokemonByStat(normalizedStat))
+        .map(pokemon => pokemon.name);
+    }
+
+    const total = matchingNames.length;
+    const totalPages = Math.max(Math.ceil(total / pageSize), 1);
+    const safePage = Math.min(currentPage, totalPages);
+    const start = (safePage - 1) * pageSize;
+    const pageNames = matchingNames.slice(start, start + pageSize);
+    const pagePokemon = await mapWithConcurrency(
+      pageNames,
+      DETAIL_BATCH_SIZE,
+      name => fetchPokemon(name).catch(() => null)
+    );
+
+    const payload = {
+      results: pagePokemon.filter(Boolean).map(toPokemonSummary),
+      pagination: {
+        page: safePage,
+        limit: pageSize,
+        total,
+        totalPages,
+        hasPreviousPage: safePage > 1,
+        hasNextPage: safePage < totalPages
+      }
+    };
+
+    cache.set(cacheKey, payload);
+    return payload;
+  } catch (error) {
+    console.error('Error listing Pokemon:', error.message);
+    throw new Error('Failed to list Pokemon');
+  }
+}
+
+export async function fetchPokemonNamesByType(typeName) {
+  const normalizedType = normalizeName(typeName);
+  const cacheKey = `type:pokemon-names:${normalizedType}`;
+  const cached = cache.get(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const response = await axios.get(`${API_BASE}/type/${normalizedType}`);
+  const names = [
+    ...response.data.pokemon.map(entry => entry.pokemon.name),
+    ...currentOverrides.pokemon
+      .filter(pokemon => pokemon.types.includes(normalizedType))
+      .map(pokemon => pokemon.name)
+  ];
+
+  cache.set(cacheKey, names);
+  return names;
 }
 
 /**
@@ -341,7 +492,7 @@ export async function listHeldItems(query = '') {
 }
 
 /**
- * Clear cache for testing/debugging
+ * Clear cache for testing/debugging.
  */
 export function clearCache() {
   cache.flushAll();
@@ -352,6 +503,8 @@ export default {
   fetchMove,
   fetchType,
   searchPokemon,
+  listPokemon,
+  fetchPokemonNamesByType,
   listMovesForPokemon,
   fetchItem,
   listHeldItems,
