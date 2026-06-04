@@ -1,42 +1,49 @@
 import express from 'express';
-import { fetchPokemon, searchPokemon } from '../services/pokeapi-cache.js';
+import { fetchPokemon, listPokemon } from '../services/pokeapi-cache.js';
 import { isPokemonAllowed, isRestricted } from '../services/vgc-validator.js';
 
 const router = express.Router();
 
+function toPokemonResponse(data, includeDetails = false) {
+  const response = {
+    id: data.id,
+    name: data.name,
+    displayName: data.displayName || data.name,
+    types: data.types,
+    baseStats: data.baseStats,
+    sprite: data.sprite,
+    isRestricted: isRestricted(data.name),
+    isAllowed: isPokemonAllowed(data.name)
+  };
+
+  if (includeDetails) {
+    response.abilities = data.abilities;
+    response.moves = data.moves;
+  }
+
+  return response;
+}
+
 /**
  * GET /api/pokemon
- * Search Pokémon by name/query
- * Query params: q=pikachu
+ * Browse/search Pokémon.
+ * Query params: q, page, limit, type, stat, minStat
  */
 router.get('/', async (req, res) => {
   try {
-    const query = req.query.q || '';
-    
-    if (query.length < 2) {
-      return res.status(400).json({ error: 'Search query must be at least 2 characters' });
-    }
+    const pokemonList = await listPokemon({
+      query: req.query.q || '',
+      page: req.query.page,
+      limit: req.query.limit,
+      type: req.query.type || '',
+      stat: req.query.stat || '',
+      minStat: req.query.minStat || ''
+    });
 
-    const results = await searchPokemon(query);
-    const pokemonData = await Promise.all(
-      results.map(async (result) => {
-        try {
-          const data = await fetchPokemon(result.name);
-          return {
-            id: data.id,
-            name: data.name,
-            types: data.types,
-            sprite: data.sprite,
-            isRestricted: isRestricted(data.name),
-            isAllowed: isPokemonAllowed(data.name)
-          };
-        } catch (err) {
-          return null;
-        }
-      })
-    );
-
-    res.json(pokemonData.filter(Boolean));
+    res.json({
+      ...pokemonList,
+      results: pokemonList.results.map(pokemon => toPokemonResponse(pokemon))
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -49,19 +56,7 @@ router.get('/', async (req, res) => {
 router.get('/:idOrName', async (req, res) => {
   try {
     const data = await fetchPokemon(req.params.idOrName);
-    
-    res.json({
-      id: data.id,
-      name: data.name,
-      displayName: data.displayName || data.name,
-      types: data.types,
-      baseStats: data.baseStats,
-      abilities: data.abilities,
-      sprite: data.sprite,
-      moves: data.moves,
-      isRestricted: isRestricted(data.name),
-      isAllowed: isPokemonAllowed(data.name)
-    });
+    res.json(toPokemonResponse(data, true));
   } catch (error) {
     res.status(404).json({ error: error.message });
   }

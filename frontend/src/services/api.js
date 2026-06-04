@@ -7,9 +7,26 @@ const API_BASE = '/api';
 /**
  * Search Pokémon
  */
-export async function searchPokemon(query) {
-  const response = await fetch(`${API_BASE}/pokemon?q=${encodeURIComponent(query)}`);
-  if (!response.ok) throw new Error('Failed to search Pokémon');
+export async function searchPokemon({
+  query = '',
+  page = 1,
+  limit = 24,
+  type = '',
+  stat = '',
+  minStat = ''
+} = {}) {
+  const params = new URLSearchParams({
+    q: query,
+    page: String(page),
+    limit: String(limit)
+  });
+
+  if (type) params.set('type', type);
+  if (stat) params.set('stat', stat);
+  if (minStat) params.set('minStat', String(minStat));
+
+  const response = await fetch(`${API_BASE}/pokemon?${params.toString()}`);
+  if (!response.ok) throw new Error('Failed to load Pokémon');
   return response.json();
 }
 

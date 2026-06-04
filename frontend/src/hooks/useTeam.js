@@ -8,7 +8,9 @@ export function useTeam(initialTeam = []) {
 
   const addPokemon = useCallback((pokemon, slot) => {
     const newTeam = [...team];
-    newTeam[slot] = {
+    const targetSlot = Math.min(slot, newTeam.length);
+
+    newTeam[targetSlot] = {
       pokemon,
       moves: [],
       ability: pokemon.abilities[0]?.name || '',
