@@ -32,6 +32,26 @@ export async function getMove(idOrName) {
 }
 
 /**
+ * Get legal move details for a Pokemon.
+ */
+export async function getMovesForPokemon(pokemonName, query = '') {
+  const params = new URLSearchParams({ pokemon: pokemonName, q: query });
+  const response = await fetch(`${API_BASE}/moves?${params.toString()}`);
+  if (!response.ok) throw new Error('Failed to load moves');
+  return response.json();
+}
+
+/**
+ * Search held items.
+ */
+export async function searchItems(query = '') {
+  const params = new URLSearchParams({ q: query });
+  const response = await fetch(`${API_BASE}/items?${params.toString()}`);
+  if (!response.ok) throw new Error('Failed to load items');
+  return response.json();
+}
+
+/**
  * Validate team
  */
 export async function validateTeam(team) {
@@ -61,6 +81,8 @@ export default {
   searchPokemon,
   getPokemon,
   getMove,
+  getMovesForPokemon,
+  searchItems,
   validateTeam,
   analyzeTeam
 };

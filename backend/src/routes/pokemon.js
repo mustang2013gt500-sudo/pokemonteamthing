@@ -53,6 +53,7 @@ router.get('/:idOrName', async (req, res) => {
     res.json({
       id: data.id,
       name: data.name,
+      displayName: data.displayName || data.name,
       types: data.types,
       baseStats: data.baseStats,
       abilities: data.abilities,

@@ -85,6 +85,25 @@
   width: 100%;
 }
 
+.form-group input + select {
+  margin-top: 6px;
+}
+
+.selected-item,
+.field-error {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.selected-item {
+  color: #666;
+}
+
+.field-error {
+  color: #d32f2f;
+}
+
 .moves-list {
   background: #f8f9fa;
   border: 1px solid #e9ecef;
