@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getMovesForPokemon } from '../services/api.js';
 import { getTypeColor, getTypeEmoji } from '../utils/type-colors.js';
 import './MovePicker.css';
 
@@ -6,42 +7,28 @@ export default function MovePicker({ pokemon, selectedMoves, onMovesSelected, on
   const [available, setAvailable] = useState([]);
   const [selected, setSelected] = useState(selectedMoves || []);
   const [filter, setFilter] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Generate mock move data (in production, fetch from API)
-    // For now, use Pokemon's move pool
-    const moves = pokemon.moves.slice(0, 30).map(moveName => ({
-      name: moveName,
-      type: getRandomType(), // Mock type
-      power: Math.floor(Math.random() * 150) || null,
-      accuracy: 100
-    }));
-    setAvailable(moves);
-  }, [pokemon]);
+    setLoading(true);
+    setError('');
 
-  const getRandomType = () => {
-    const types = [
-      'normal',
-      'fire',
-      'water',
-      'electric',
-      'grass',
-      'ice',
-      'fighting',
-      'poison',
-      'ground',
-      'flying',
-      'psychic',
-      'bug',
-      'rock',
-      'ghost',
-      'dragon',
-      'dark',
-      'steel',
-      'fairy'
-    ];
-    return types[Math.floor(Math.random() * types.length)];
-  };
+    const timer = setTimeout(() => {
+      getMovesForPokemon(pokemon.name, filter)
+        .then(moves => {
+          setAvailable(moves);
+          setLoading(false);
+        })
+        .catch(err => {
+          setError(err.message);
+          setAvailable([]);
+          setLoading(false);
+        });
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [pokemon.name, filter]);
 
   const toggleMove = move => {
     const isSelected = selected.some(m => m.name === move.name);
@@ -51,10 +38,6 @@ export default function MovePicker({ pokemon, selectedMoves, onMovesSelected, on
       setSelected([...selected, move]);
     }
   };
-
-  const filtered = available.filter(move =>
-    move.name.toLowerCase().includes(filter.toLowerCase())
-  );
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -70,8 +53,16 @@ export default function MovePicker({ pokemon, selectedMoves, onMovesSelected, on
           autoFocus
         />
 
+        {error && <div className="error-message">{error}</div>}
+
         <div className="moves-grid">
-          {filtered.map(move => {
+          {loading && <p className="loading">Loading moves...</p>}
+
+          {!loading && available.length === 0 && (
+            <p className="no-moves">No moves found.</p>
+          )}
+
+          {!loading && available.map(move => {
             const isSelected = selected.some(m => m.name === move.name);
             return (
               <div
@@ -90,9 +81,10 @@ export default function MovePicker({ pokemon, selectedMoves, onMovesSelected, on
                     className="type-badge"
                     style={{ backgroundColor: getTypeColor(move.type) }}
                   >
-                    {move.type}
+                    {getTypeEmoji(move.type)} {move.type}
                   </span>
                   {move.power && <span className="power">Power: {move.power}</span>}
+                  {move.accuracy && <span className="power">Acc: {move.accuracy}</span>}
                 </div>
               </div>
             );

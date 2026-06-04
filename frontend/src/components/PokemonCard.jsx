@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { searchItems } from '../services/api.js';
 import { getTypeColor, getTypeEmoji } from '../utils/type-colors.js';
 import MovePicker from './MovePicker.jsx';
 import './PokemonCard.css';
@@ -35,7 +36,26 @@ export default function PokemonCard({
   onItemChange
 }) {
   const [showMovePicker, setShowMovePicker] = useState(false);
+  const [items, setItems] = useState([]);
+  const [itemFilter, setItemFilter] = useState('');
+  const [itemError, setItemError] = useState('');
   const pokemon = member.pokemon;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchItems(itemFilter)
+        .then(data => {
+          setItems(data);
+          setItemError('');
+        })
+        .catch(err => {
+          setItemError(err.message);
+          setItems([]);
+        });
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [itemFilter]);
 
   const handleMovesSelected = (moves) => {
     onMovesChange(moves);
@@ -97,10 +117,22 @@ export default function PokemonCard({
             <label>Held Item</label>
             <input
               type="text"
-              placeholder="e.g., Choice Scarf"
-              value={member.item || ''}
-              onChange={e => onItemChange(e.target.value)}
+              placeholder="Search item library..."
+              value={itemFilter}
+              onChange={e => setItemFilter(e.target.value)}
             />
+            <select value={member.item || ''} onChange={e => onItemChange(e.target.value)}>
+              <option value="">No item</option>
+              {items.map(item => (
+                <option key={item.name} value={item.name}>
+                  {item.displayName}
+                </option>
+              ))}
+            </select>
+            {member.item && (
+              <small className="selected-item">Selected: {member.item}</small>
+            )}
+            {itemError && <small className="field-error">{itemError}</small>}
           </div>
 
           {/* Moves */}

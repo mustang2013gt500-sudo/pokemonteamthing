@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pokemonRoutes from './routes/pokemon.js';
 import movesRoutes from './routes/moves.js';
+import itemsRoutes from './routes/items.js';
 import teamsRoutes from './routes/teams.js';
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 // Routes
 app.use('/api/pokemon', pokemonRoutes);
 app.use('/api/moves', movesRoutes);
+app.use('/api/items', itemsRoutes);
 app.use('/api/teams', teamsRoutes);
 
 // Health check

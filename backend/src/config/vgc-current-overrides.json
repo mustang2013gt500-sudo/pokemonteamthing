@@ -1,0 +1,97 @@
+{
+  "format": "Pokemon Champions VGC 2026 Regulation Set M-A",
+  "notes": "Small current-format override layer for Pokemon, moves, and items seen in current Limitless/Pikalytics VGC data but not always available in PokeAPI yet.",
+  "pokemon": [
+    {
+      "id": "vgc-mega-dragonite",
+      "name": "dragonite-mega",
+      "displayName": "Mega Dragonite",
+      "types": ["dragon", "flying"],
+      "baseStats": {
+        "hp": 91,
+        "attack": 134,
+        "defense": 95,
+        "spAtk": 100,
+        "spDef": 100,
+        "speed": 80
+      },
+      "abilities": [{ "name": "multiscale", "isHidden": false }],
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png",
+      "movesFrom": "dragonite",
+      "extraMoves": ["protect", "tailwind", "dragon-pulse", "hurricane", "draco-meteor", "thunderbolt", "flamethrower", "heat-wave", "air-slash", "ice-beam", "extreme-speed", "thunder"]
+    },
+    {
+      "id": "vgc-mega-floette",
+      "name": "floette-mega",
+      "aliases": ["floette-eternal"],
+      "displayName": "Mega Floette",
+      "types": ["fairy"],
+      "baseStats": {
+        "hp": 74,
+        "attack": 65,
+        "defense": 67,
+        "spAtk": 125,
+        "spDef": 128,
+        "speed": 92
+      },
+      "abilities": [{ "name": "fairy-aura", "isHidden": false }],
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/670.png",
+      "movesFrom": "floette",
+      "extraMoves": ["protect", "dazzling-gleam", "moonblast", "light-of-ruin", "calm-mind", "draining-kiss"]
+    },
+    {
+      "id": "vgc-mega-froslass",
+      "name": "froslass-mega",
+      "displayName": "Mega Froslass",
+      "types": ["ice", "ghost"],
+      "baseStats": {
+        "hp": 70,
+        "attack": 80,
+        "defense": 70,
+        "spAtk": 80,
+        "spDef": 70,
+        "speed": 110
+      },
+      "abilities": [{ "name": "snow-warning", "isHidden": false }],
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/478.png",
+      "movesFrom": "froslass",
+      "extraMoves": ["blizzard", "protect", "shadow-ball", "aurora-veil", "taunt", "rain-dance"]
+    },
+    {
+      "id": "vgc-mega-scovillain",
+      "name": "scovillain-mega",
+      "displayName": "Mega Scovillain",
+      "types": ["grass", "fire"],
+      "baseStats": {
+        "hp": 65,
+        "attack": 108,
+        "defense": 65,
+        "spAtk": 108,
+        "spDef": 65,
+        "speed": 75
+      },
+      "abilities": [{ "name": "spicy-spray", "isHidden": false }],
+      "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/952.png",
+      "movesFrom": "scovillain",
+      "extraMoves": ["rage-powder", "protect", "overheat", "leech-seed", "giga-drain", "flamethrower", "leaf-storm"]
+    }
+  ],
+  "moves": [
+    {
+      "id": "vgc-spicy-spray",
+      "name": "spicy-spray",
+      "type": "fire",
+      "power": null,
+      "accuracy": 100,
+      "pp": 20,
+      "priority": 0,
+      "effect": "Current-format custom data placeholder. Verify against the official Pokemon Champions ruleset when published."
+    }
+  ],
+  "items": [
+    { "id": "vgc-dragoninite", "name": "dragoninite", "displayName": "Dragoninite", "category": "mega-stones" },
+    { "id": "vgc-floettite", "name": "floettite", "displayName": "Floettite", "category": "mega-stones" },
+    { "id": "vgc-froslassite", "name": "froslassite", "displayName": "Froslassite", "category": "mega-stones" },
+    { "id": "vgc-scovillainite", "name": "scovillainite", "displayName": "Scovillainite", "category": "mega-stones" }
+  ]
+}
